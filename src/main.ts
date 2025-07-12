@@ -11,7 +11,16 @@ async function bootstrap() {
   const config = new DocumentBuilder().setTitle('Assana Lite API')
     .setDescription('API documentation for Assana Lite')
     .setVersion('1.0')
-    .addBearerAuth()
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        in: 'header',
+        name: 'Authorization',
+      },
+      'access-token',
+    )
     .build();
 
     const document = SwaggerModule.createDocument(app, config);
@@ -19,7 +28,7 @@ async function bootstrap() {
 
     app.use(cookieParser());
 
-    app.useGlobalGuards(new JwtAuthGuard(), new RolesGuard(new Reflector()))
+    // app.useGlobalGuards(new JwtAuthGuard(), new RolesGuard(new Reflector()))
     
   await app.listen(process.env.PORT ?? 3000);
 }

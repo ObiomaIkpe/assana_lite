@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ProjectsModule } from './projects/projects.module';
+import { SeederModule } from './seeder/seeder.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -24,7 +25,7 @@ import { ProjectsModule } from './projects/projects.module';
       autoLoadEntities: true,
       synchronize: true, // Set to false in production
     })
-  }), AuthModule, UsersModule, ProjectsModule
+  }), AuthModule, UsersModule, ProjectsModule, SeederModule
 ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,5 +1,6 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { UserProfile } from "./user-profile.entity";
+import { Role } from "src/auth/roles/roles.enum";
 
 @Entity()
 export class User {
@@ -12,8 +13,8 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ default: 'user' })
-  role: 'admin' | 'manager' | 'user';
+  @Column({ type: 'enum', enum: Role, default: Role.USER })
+  role: Role;
 
   @OneToOne(() => UserProfile, profile => profile.user, { cascade: true, eager: true, nullable: true})
   @JoinColumn()
