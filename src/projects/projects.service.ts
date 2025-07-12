@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from './projectsEntity/project.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { User } from 'src/users/Entity/user.entity';
 import { UserProfile } from 'src/users/Entity/user-profile.entity';
 import { CreateProjectDto } from './projectDTOs/createProjectDto';
@@ -30,9 +30,13 @@ export class ProjectsService {
 
         const { name, description, isShared, memberProfileIds } = createProjectDto;
 
-  const members = memberProfileIds?.length
-    ? await this.userProfileRepository.findBy(memberProfileIds)
-    : [];
+        let members: UserProfile[] = []
+
+        if(isShared && memberProfileIds && memberProfileIds.length) {
+            members = await this.userProfileRepository.findBy({
+                id: In(memberProfileIds)
+        });
+      }
 
   const project = this.projectRepository.create({
     name,
@@ -42,8 +46,7 @@ export class ProjectsService {
     members,
   });
 
-  // ✅ THIS RETURN FIXES THE ERROR
-  return await this.projectRepository.save(project);
-    }
+return await this.projectRepository.save(project);
+  }
 }
 

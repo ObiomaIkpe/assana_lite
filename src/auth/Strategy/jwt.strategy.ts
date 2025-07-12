@@ -7,7 +7,7 @@ import { ExtractJwt, Strategy } from "passport-jwt";
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(private readonly configService: ConfigService) {
-        const secret = configService.get<string>('JWT_SECRET');
+        const secret = configService.get<string>('JWT_ACCESS_SECRET');
         if (!secret) {
             throw new Error('JWT_SECRET is not defined in the configuration');
         }
@@ -19,6 +19,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     async validate(payload: any) {
-        return payload
+        return {userId: payload.id, role: payload.role, email: payload.email};
     }
 }
