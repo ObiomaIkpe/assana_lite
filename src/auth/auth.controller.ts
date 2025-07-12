@@ -1,9 +1,9 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Post, Req, Res } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './DTOs/register.dto';
 import { LoginDto } from './DTOs/login.dto';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -23,5 +23,15 @@ export class AuthController {
     login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
         return this.authService.login(loginDto, res);  
     } 
+
+    @Post('refresh')
+  @ApiOperation({ summary: 'Refresh access token using refresh token cookie' })
+  async refresh(@Req() req: Request, @Res() res: Response) {
+    const refreshToken = req.cookies?.['refresh_token'];
+    const result = await this.authService.refreshToken(res, refreshToken);
+    return res.json(result);
+  }
+
+  
 
 }

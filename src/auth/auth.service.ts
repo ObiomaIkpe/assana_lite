@@ -67,4 +67,36 @@ export class AuthService {
 
   return { accessToken, refreshToken };        
     }
+
+
+    async refreshToken(res: Response, refreshToken: string) {
+        if (!refreshToken) {
+    throw new UnauthorizedException('Refresh token not found');
+  }
+
+  try {
+    const payload = this.jwtService.verify(refreshToken, {
+      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+    });
+
+    const user = await this.usersService.findByEmail(payload.email);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    const { accessToken, refreshToken: newRefreshToken } = this.generateToken(user);
+
+    res.cookie('refresh_token', newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/auth/refresh',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return { accessToken };
+  } catch (err) {
+    throw new UnauthorizedException('Invalid refresh token');
+  }
+    }
 }

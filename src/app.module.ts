@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { ProjectsModule } from './projects/projects.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -23,7 +24,7 @@ import { UsersModule } from './users/users.module';
       autoLoadEntities: true,
       synchronize: true, // Set to false in production
     })
-  }), AuthModule, UsersModule
+  }), AuthModule, UsersModule, ProjectsModule
 ],
   controllers: [AppController],
   providers: [AppService],
