@@ -18,5 +18,5 @@ export class User {
 
   @OneToOne(() => UserProfile, profile => profile.user, { cascade: true, eager: true, nullable: true})
   @JoinColumn()
-  profile?: UserProfile;
+  profile: UserProfile | null;
 }

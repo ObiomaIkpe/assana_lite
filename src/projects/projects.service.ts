@@ -1,52 +1,46 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from './projectsEntity/project.entity';
-import { In, Repository } from 'typeorm';
-import { User } from 'src/users/Entity/user.entity';
-import { UserProfile } from 'src/users/Entity/user-profile.entity';
+import { Repository, In } from 'typeorm';
 import { CreateProjectDto } from './projectDTOs/createProjectDto';
+import { UpdateProjectDto } from './projectDTOs/update-project.dto';
+import { User } from '../users/Entity/user.entity';
+import { UserProfile } from '../users/Entity/user-profile.entity';
 
 @Injectable()
 export class ProjectsService {
-    constructor(
-        @InjectRepository(Project)
-        private readonly projectRepository: Repository<Project>,
+  constructor(
+    @InjectRepository(Project)
+    private readonly projectRepo: Repository<Project>,
 
-        @InjectRepository(User)
-        private readonly userRepository: Repository<User>,
+    @InjectRepository(UserProfile)
+    private readonly profileRepo: Repository<UserProfile>,
+    
+    @InjectRepository(User)
+    private readonly User: Repository<User>,
+  ) {}
 
-        @InjectRepository(UserProfile)
-        private readonly userProfileRepository: Repository<UserProfile>
-    ) {}
+  async createProject(dto: CreateProjectDto, user: User): Promise<Project> {
+  const ownerProfile = await this.profileRepo.findOne({
+    where: { user: { id: user.id } },
+  });
 
-    async createProject(createProjectDto: CreateProjectDto, userId: number): Promise<Project> {
-        const user = await this.userRepository.findOne({
-            where: {id: userId},
-            relations: ['profile']
-        })
-        if (!user || !user.profile){
-            throw new NotFoundException('User not found');
-        }
+  if (!ownerProfile) {
+    throw new NotFoundException('Owner profile not found.');
+  }
 
-        const { name, description, isShared, memberProfileIds } = createProjectDto;
+  const members: UserProfile[] = dto.memberIds?.length
+    ? await this.profileRepo.findBy({ id: In(dto.memberIds) })
+    : [];
 
-        let members: UserProfile[] = []
-
-        if(isShared && memberProfileIds && memberProfileIds.length) {
-            members = await this.userProfileRepository.findBy({
-                id: In(memberProfileIds)
-        });
-      }
-
-  const project = this.projectRepository.create({
-    name,
-    description,
-    isShared,
-    owner: user.profile,
+  const project = this.projectRepo.create({
+    title: dto.title,
+    description: dto.description,
+    owner: ownerProfile,
     members,
   });
 
-return await this.projectRepository.save(project);
-  }
+  return this.projectRepo.save(project);
 }
-
+  
+}

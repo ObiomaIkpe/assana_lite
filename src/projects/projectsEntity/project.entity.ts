@@ -8,32 +8,49 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { UserProfile } from 'src/users/Entity/user-profile.entity';
+import { UserProfile } from '../../users/Entity/user-profile.entity';
+
+export enum ProjectStatus {
+  PLANNING = 'PLANNING',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  ON_HOLD = 'ON_HOLD',
+}
 
 @Entity()
 export class Project {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column()
-  name: string;
+  title: string;
 
   @Column({ nullable: true })
-  description?: string;
+  description: string;
 
-  @Column({ default: false })
-  isShared: boolean;
-
-  @ManyToOne(() => UserProfile, profile => profile.ownedProjects, { eager: true })
-  owner: UserProfile;
-
-  @ManyToMany(() => UserProfile, profile => profile.sharedProjects, { eager: true })
-  @JoinTable()
-  members: UserProfile[];
+  @Column({
+    type: 'enum',
+    enum: ProjectStatus,
+    default: ProjectStatus.PLANNING,
+  })
+  status: ProjectStatus;
 
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @ManyToOne(() => UserProfile, (userProfile) => userProfile.ownedProjects, {
+    eager: true,
+    nullable: false,
+  })
+  owner: UserProfile;
+
+  @ManyToMany(() => UserProfile, (userProfile) => userProfile.sharedProjects, {
+    cascade: true,
+    eager: true,
+  })
+  @JoinTable()
+  members: UserProfile[];
 }
