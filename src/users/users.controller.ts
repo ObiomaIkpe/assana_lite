@@ -34,13 +34,13 @@ export class UsersController {
     }
 
 
-    //update user profile DTO.
+    //update user profile.
     @Put('profile')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth('access-token') 
+    @UseInterceptors(FileInterceptor('avatar', multerImageOptions))
     @ApiOperation({ summary: 'Update the current user profile' })
     @ApiConsumes('multipart/form-data')
-    @UseInterceptors(FileInterceptor('avatar', multerImageOptions))
     @ApiBody({
     schema: {
         type: 'object',
@@ -54,7 +54,6 @@ export class UsersController {
     @ApiResponse({ status: 200, description: 'User profile updated successfully', type: User })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 404, description: 'User not found' })
-
     async updateProfile(
     @CurrentUser() user: User,
     @UploadedFile() file: Express.MulterFile,
@@ -64,9 +63,11 @@ export class UsersController {
         const avatarUrl = await this.cloudinaryService.uploadImage(file.buffer, `user-${user.id}`);
         profileData.avatarUrl = avatarUrl;
     }
+        console.log('Logged-in user:', user)
         return this.usersService.updateProfile(user.id, profileData);
         }
-    }     
+
+}     
 
 
 

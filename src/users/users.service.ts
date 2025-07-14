@@ -23,33 +23,34 @@ export class UsersService {
     }
   
     async updateProfile(userId: number, dto: UpdateUserProfileDto): Promise<User> {
-      //1. get the user
+    // 1. Get the user with profile relation
     const user = await this.userRepo.findOne({
       where: { id: userId },
-      relations: ['profile'],
+      relations: ['profile', 'profile.user', 'profile.ownedProjects', 'profile.sharedProjects'],
     });
 
+    console.log(user)
+
     if (!user) {
-      throw new NotFoundException('User not found');
+    throw new NotFoundException('User not found');
     }
 
-    // 2. Check if the user already has a profile
-      let profile = user.profile;
-       
-      if (profile) {
-      // Update existing profile
+    // 2. Update or create profile
+    let profile = user.profile;
+
+    if (profile) {
       profile = this.profileRepo.merge(profile, dto);
     } else {
-      // Create a new profile and assign it
       profile = this.profileRepo.create(dto);
+      profile.user = user; // 🧠 important to bind profile to current user
     }
 
-      // 3. Assign profile to user
-      user.profile = profile;
+    // 3. Assign updated profile back to user
+    user.profile = profile;
 
-      // 4. Save user (because of cascade, profile gets saved too)
-      return this.userRepo.save(user);
-  }
+    // 4. Save user — cascade will handle profile
+    return this.userRepo.save(user); // ✅ Save using userRepo, not profileRepo
+}
 
   
 }

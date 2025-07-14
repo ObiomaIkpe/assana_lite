@@ -1,6 +1,7 @@
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn, OneToMany, ManyToMany } from 'typeorm';
 import { User } from './user.entity';
 import { Project } from '../../projects/projectsEntity/project.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class UserProfile {
@@ -17,6 +18,7 @@ export class UserProfile {
   avatarUrl: string;
 
   @OneToOne(() => User, user => user.profile)
+  @Exclude()
   user: User;
 
   @OneToMany(() => Project, project => project.owner)

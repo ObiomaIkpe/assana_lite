@@ -47,7 +47,7 @@ export class AuthService {
     path: '/auth/refresh',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
-    return {accessToken}
+    return {accessToken, user}
 }
 
 
