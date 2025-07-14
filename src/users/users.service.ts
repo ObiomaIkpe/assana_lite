@@ -42,14 +42,14 @@ export class UsersService {
       profile = this.profileRepo.merge(profile, dto);
     } else {
       profile = this.profileRepo.create(dto);
-      profile.user = user; // 🧠 important to bind profile to current user
+      profile.user = user; 
     }
 
     // 3. Assign updated profile back to user
     user.profile = profile;
 
     // 4. Save user — cascade will handle profile
-    return this.userRepo.save(user); // ✅ Save using userRepo, not profileRepo
+    return this.userRepo.save(user); 
 }
 
   

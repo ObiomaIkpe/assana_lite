@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { ProjectsModule } from './projects/projects.module';
 import { SeederModule } from './seeder/seeder.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -26,7 +27,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
       autoLoadEntities: true,
       synchronize: true, // Set to false in production
     })
-  }), AuthModule, UsersModule, ProjectsModule, SeederModule, CloudinaryModule
+  }), AuthModule, UsersModule, ProjectsModule, SeederModule, CloudinaryModule, TasksModule
 ],
   controllers: [AppController],
   providers: [AppService],

@@ -7,8 +7,10 @@ import {
   JoinTable,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { UserProfile } from '../../users/Entity/user-profile.entity';
+import { Task } from 'src/tasks/Entity/task.entity';
 
 export enum ProjectStatus {
   PLANNING = 'PLANNING',
@@ -53,4 +55,7 @@ export class Project {
   })
   @JoinTable()
   members: UserProfile[];
+
+  @OneToMany(() => Task, (task) => task.project)
+  tasks: Task[];
 }
