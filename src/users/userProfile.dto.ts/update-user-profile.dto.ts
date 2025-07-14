@@ -13,7 +13,7 @@ export class UpdateUserProfileDto {
   @IsString()
   lastName?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({type: 'string', format: 'binary'})
   @IsOptional()
   @IsUrl()
   avatarUrl?: string;

@@ -50,4 +50,6 @@ export class UsersService {
       // 4. Save user (because of cascade, profile gets saved too)
       return this.userRepo.save(user);
   }
+
+  
 }
