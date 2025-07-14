@@ -2,6 +2,7 @@ import { Column, Entity, OneToOne, PrimaryGeneratedColumn, OneToMany, ManyToMany
 import { User } from './user.entity';
 import { Project } from '../../projects/projectsEntity/project.entity';
 import { Exclude } from 'class-transformer';
+import { Task } from 'src/tasks/Entity/task.entity';
 
 @Entity()
 export class UserProfile {
@@ -26,4 +27,10 @@ export class UserProfile {
 
   @ManyToMany(() => Project, project => project.members)
   sharedProjects: Project[];
+
+  @OneToMany(() => Task, (task) => task.assignedTo)
+  assignedTasks: Task[];
+
+  @OneToMany(() => Task, (task) => task.createdBy)
+  createdTasks: Task[];
 }
