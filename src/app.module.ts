@@ -1,11 +1,11 @@
-// src/app.module.ts
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ThrottlerModule, ThrottlerModuleOptions } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { BullModule } from '@nestjs/bull';
 import { WinstonModule } from 'nest-winston';
+import { APP_GUARD } from '@nestjs/core';
 import * as winston from 'winston';
 
 import configuration from './config/configuration';
@@ -15,7 +15,10 @@ import { getRedisConfig } from './config/redis.config';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+
+// Feature modules
 import { AuthModule } from './auth/auth.module';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -46,17 +49,17 @@ import { AuthModule } from './auth/auth.module';
 
     // Throttling
     ThrottlerModule.forRootAsync({
-    inject: [ConfigService],
-    useFactory: (configService: ConfigService) => ({
-      throttlers: [
-        {
-          name: 'default',
-          ttl: configService.get<number>('THROTTLE_TTL', 60000),
-          limit: configService.get<number>('THROTTLE_LIMIT', 10),
-        }
-      ]
-    })
-}),
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        throttlers: [
+          {
+            name: 'default',
+          ttl: configService.get<number>('throttle.ttl', 60000),
+          limit: configService.get<number>('throttle.limit',10),
+          },
+        ]
+      }),
+    }),
 
     // Event System
     EventEmitterModule.forRoot(),
@@ -89,15 +92,17 @@ import { AuthModule } from './auth/auth.module';
       inject: [ConfigService],
     }),
 
+    // Feature modules
     AuthModule,
-
-    // Feature modules will be added here
-    // AuthModule,
-    // UserProfileModule,
-    // OrganizationModule,
-    // etc.
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    // Global JWT Auth Guard
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}
