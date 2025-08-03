@@ -48,7 +48,7 @@ export class AuthService {
     }
 
     // Hash password
-    const saltRounds = 12;
+    const saltRounds = 8;
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
     // Generate email verification token
